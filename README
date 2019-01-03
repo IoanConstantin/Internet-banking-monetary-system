@@ -1,0 +1,70 @@
+PC - TEMA 2                                          Constantin Ioan - 321 CC
+-----------------------------------------------------------------------------
+
+
+Implementare
+------------
+
+- Server
+--------
+-> In server se realizeaza parsarea fisierului dat ca argument in
+linia de comanda. Pentru a retine atributele utilizatorilor am folosit
+cate un array pentru fiecare atribut, pozitia pe care se afla un
+atribut in vectorul corespunzator fiind aceeasi cu linia din fisier
+pe care se afla (adica stim ca daca luam, spre exemplu, string-urile de 
+pe aceeasi pozitie din array-urile nume si prenume, ele apartin aceluiasi user);
+
+-> Cand in procesul server se da comanda quit de la tastatura, serverul
+trimite catre toti clientii mesajul "Server_inchis", iar fiecare client
+afiseaza mesajul "Serverul se inchide" si isi termina executia; 
+
+-> Daca primul cuvant din sirul primit de la client este "login" tratez toate cazurile si trimit clientului codul de eroare corespunzator sau confirmarea
+"IBANK> Welcome <nume> <prenume>";
+	--> Un card este blocat daca din acelasi proces client se primeste de
+3 ori la rand o comanda gresita. Daca se incearca logarea pe alt card atunci
+se reseteaza contorul de pinuri gresite;
+	
+	--> sesiunedeschisa[kcurent] este 0 daca utilizatorul kcurent nu este 
+	logat si 1 altfel;
+
+-> Daca sirul primit de la client este "listsold" se intoarce soldul
+utilizatorului curent;
+
+-> Daca sirul primit este "logout" sau "quit" si utilizatorul curent 
+este logat, acesta este delogat, se reseteaza contorul de pinuri gresite
+al procesului client curent si se trimite confirmarea "Deconectare de la
+bancomat" catre client (pentru ca daca nu ar fi logat cineva in procesul
+client, acesta nu ar mai trimite comanda catre server,ci doar ar intoarce 
+codul de eroare -1).
+
+- Client
+--------
+-> In fisierul log al procesului client curent sunt scrise toate comenzile si
+rezultatele corespunzatoare acestui proces;
+
+-> Daca comanda este quit, aceasta este trimisa catre server si procesul
+client curent isi incheie executia;
+
+-> Comenzile sunt citite de la tastatura si sunt trimise in formatul in care
+sunt citite catre server, cu exceptia urmatoarelor cazuri:
+	--> comanda este logout sau listsold si sesiunea procesului client
+curent este inchisa, caz in care nu mai este trimisa la server si se
+intoarce codul de eroare -1;
+ 
+	--> comanda este login si sesiunea procesului client curent este
+deschisa, caz in care comanda nu se mai trimite la server si 
+se intoarce codul de eroare -2;
+
+-> Daca clientul primeste de la server "Deconectare de la bancomat" atunci
+se afiseaza "IBANK> Clientul a fost deconectat" si se scrie in fisierul log;
+
+-> Daca clientul primeste de la server "Server_inchis" atunci se afiseaza "Serverul se inchide", se scrie in fisierul log si se incheie executia procesului
+client;
+
+-> Daca clientul primeste de la server "IBANK> Welcome <nume> <prenume>" se
+deschide sesiunea procesului client curent;
+
+-> In server si in client am folosit apelul select pentru multiplexarea intre
+comenzile de la tastatura si mesajele de la retea;
+
+-> Am folosit scheletul laboratorului 8.
